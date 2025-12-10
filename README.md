@@ -1,3 +1,4 @@
+📄 README — VTach Detection from Single-Lead ECG
 Project Overview
 
 This project implements and evaluates two supervised machine-learning models for detecting Ventricular Tachycardia (VT) from single-lead ECG waveforms:
@@ -6,27 +7,28 @@ Logistic Regression (classical baseline)
 
 1D Convolutional Neural Network (deep learning baseline)
 
-The project demonstrates the challenges of rare-event detection under extreme class imbalance (10 VT vs 990 non-VT).
-All code runs end-to-end in Jupyter or Google Colab.
+The goal is to demonstrate the challenges of rare-event detection under extreme imbalance (10 VT vs 990 non-VT).
+All code runs end-to-end in a Jupyter notebook or Google Colab.
 
 1. Dataset
 
 Name: ECG Signals
-Source: Kaggle – radwakandeel/ecg-signals
+Source: Kaggle — radwakandeel/ecg-signals
 URL: https://www.kaggle.com/datasets/radwakandeel/ecg-signals
 
-Format: .mat files grouped into 17 arrhythmia classes (e.g., 1 NSR, 10 VT, 4 AFIB, etc.)
+Format:
+.mat ECG files grouped into 17 arrhythmia folders (e.g., 1 NSR, 10 VT, 4 AFIB, etc.)
 Waveform length: 3,600 samples per ECG segment
 
 Task framing:
 
 Positive class (1): VT recordings from folder 10 VT
 
-Negative class (0): All other 16 rhythm classes
+Negative class (0): All other rhythm classes
 
 Imbalance: 10 VT vs 990 non-VT
 
-No PHI included; data is de-identified.
+Data is fully de-identified; no PHI or subject identifiers included.
 
 2. Repository Structure
 project-root/
@@ -36,7 +38,7 @@ project-root/
 ├── README.md                # This file
 └── (Generated during runtime)
      ├── data/               # Kaggle dataset downloaded by kagglehub
-     ├── figures/            # Plots such as imbalance charts and CNN learning curves
+     ├── figures/            # Plots (EDA + CNN learning curves)
 
 3. Environment & Dependencies
 
@@ -44,7 +46,7 @@ Recommended environment:
 
 Python 3.9 or 3.10
 
-GPU optional (CPU works but CNN will run slower)
+CPU or GPU (GPU optional but speeds up CNN training)
 
 Major libraries:
 
@@ -58,19 +60,23 @@ neurokit2            # optional (used for HR-based feature extraction)
 kagglehub
 
 
-Install with:
+Install dependencies:
 
 pip install -r requirements.txt
 
-4. Reproducibility Notes
+4. Reproducibility Notes (Deterministic Seeds — REQUIRED)
 
-The code sets:
+This project enables full deterministic reproducibility by setting seeds for all major frameworks:
 
-numpy, random, and torch seeds
+Python random
 
-CUDA deterministic flags (if GPU available)
+NumPy
 
-These ensure that experiments are repeatable across runs.
+PyTorch (CPU)
+
+PyTorch CUDA (with deterministic backend settings)
+
+These seeds are initialized at the top of the notebook in the “Reproducibility” section so that all model training runs are repeatable across environments.
 
 5. How to Run (Google Colab Recommended)
 Step 1 — Open the Notebook
@@ -85,67 +91,90 @@ Run the first cell:
 
 Step 3 — Authenticate Kaggle
 
-Either:
+You may either:
 
-Upload your kaggle.json API key, or
+Upload your kaggle.json API key in Colab, or
 
-Approve KaggleHub access
+Allow kagglehub to access your Kaggle account interactively
 
-Step 4 — Run All Cells in Order
+Step 4 — Run All Cells (Top-to-Bottom)
 
-The notebook performs:
+The notebook performs the full pipeline:
 
-Download dataset
-
+1. Download dataset
 kagglehub.dataset_download("radwakandeel/ecg-signals")
 
+2. Load data
 
-Load .mat ECG signals into a pandas DataFrame (shape: 1000 × 3601)
+Load .mat ECG signals and convert them into a DataFrame
+(shape: 1000 rows × 3601 columns).
 
-EDA
+3. EDA
 
-Class imbalance bar chart
+Class imbalance bar plot
 
-Sample NSR and VT waveforms
+Example NSR and VT waveform plots
 
-Preprocessing
+4. Preprocessing
 
-Stratified train/test split (70/30 or 80/20)
+Stratified train/test split (70/30 and 80/20)
 
-Standardization for LR and CNN
+Standardization (train fit, test transform)
 
-Train models
+5. Train Models
 
-Logistic Regression with 5-fold CV
+Logistic Regression
 
-CNN with weighted BCE loss, dropout, and internal validation set
+5-fold stratified cross-validation
 
-Evaluate
+Class-balanced training
 
-Sensitivity, specificity, false-positive rate
+1D CNN
+
+Internal train/validation split
+
+Weighted BCE loss
+
+Dropout and class weighting
+
+Multiple hyperparameter configurations
+
+6. Evaluate
+
+Metrics printed to console:
+
+Sensitivity
+
+Specificity
+
+False Positive Rate
 
 Precision
 
-ROC-AUC and AUCPR (important for rare events)
+ROC-AUC
 
-Outputs
+AUCPR (critical for imbalance)
 
-Training/validation loss curves
+7. Outputs
+
+Notebook automatically generates:
 
 EDA plots
 
-Metrics printed to console
+CNN training/validation loss curves
 
-6. Expected Outputs
+Logistic regression and CNN test metrics
 
-The notebook generates:
+6. Expected Runtime & Hardware Notes
 
-Class imbalance plot
+CPU: Full run completes in ~3–5 minutes
 
-NSR and VT waveform examples
+GPU: CNN training reduces to <1 minute (e.g., Colab T4)
 
-CNN overfitting curves
+Memory usage: <1 GB
 
-Logistic regression CV metrics
+The entire pipeline is lightweight and suitable for laptops or Colab free tier.
 
-Final test metrics for both models
+7. Citation
+
+If using this project in academic work, please cite the Kaggle dataset and toolkits (NumPy, Pandas, SciPy, PyTorch, scikit-learn, Matplotlib, NeuroKit2, KaggleHub).
