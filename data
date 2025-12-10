@@ -1,0 +1,9 @@
+scripts/download_data.py
+import kagglehub
+
+def download_ecg_dataset():
+    path = kagglehub.dataset_download("radwakandeel/ecg-signals")
+    print("Dataset downloaded to:", path)
+
+if __name__ == "__main__":
+    download_ecg_dataset()
